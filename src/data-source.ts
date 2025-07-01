@@ -2,6 +2,9 @@ import { DataSource } from "typeorm";
 import { Restaurante } from "./entities/Restaurante";
 import { Categoria } from "./entities/Categoria";
 import { Produto } from "./entities/Produto";
+import { Pedido } from "./entities/Pedido";
+import { ItemPedido } from "./entities/ItemPedido";
+
 import * as dotenv from "dotenv";
 
 dotenv.config();
@@ -15,5 +18,5 @@ export const AppDataSource = new DataSource({
     database: process.env.DB_NAME,
     synchronize: true,
     logging: true,
-    entities: [Restaurante, Categoria, Produto],
+    entities: [Restaurante, Categoria, Produto, Pedido, ItemPedido],
 });
