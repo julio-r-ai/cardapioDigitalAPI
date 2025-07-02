@@ -10,38 +10,46 @@ const pedidoRepo = AppDataSource.getRepository(Pedido);
 const restauranteRepo = AppDataSource.getRepository(Restaurante);
 const produtoRepo = AppDataSource.getRepository(Produto);
 
-// Listar todos os pedidos
-router.get("/", async (req: Request, res: Response) => {
-    const pedidos = await pedidoRepo.find({ relations: ["restaurante", "itens", "itens.produto"] });
-    res.json(pedidos);
-});
-
-// Criar um pedido
 router.post("/", async (req: Request, res: Response) => {
     const { restauranteId, itens } = req.body;
 
     const restaurante = await restauranteRepo.findOneBy({ id: restauranteId });
-    if (!restaurante) return res.status(404).json({ message: "Restaurante não encontrado" });
+    if (!restaurante) { 
+        res.status(404).json({ message: "Restaurante não encontrado" });
+    } else {
+        const novoPedido = pedidoRepo.create({
+          status: "Pendente",
+            itens: [],
+                 restaurante,
+     });
 
-    const novoPedido = pedidoRepo.create({
-        restaurante,
-        status: "Pendente",
-        itens: [],
-    });
+        let erroProduto = false;
 
-    for (const item of itens) {
-        const produto = await produtoRepo.findOneBy({ id: item.produtoId });
-        if (!produto) return res.status(404).json({ message: `Produto ID ${item.produtoId} não encontrado` });
+        for (const item of itens) {
+            const produto = await produtoRepo.findOneBy({ id: Number(item.produtoId) });
+            if (!produto) {
+                res.status(404).json({ message: `Produto ID ${item.produtoId} não encontrado` });
+                erroProduto = true;
+                break;
+            } else {
+                const itemPedido = new ItemPedido();
+                itemPedido.produto = produto;
+                itemPedido.quantidade = item.quantidade;
 
-        const itemPedido = new ItemPedido();
-        itemPedido.produto = produto;
-        itemPedido.quantidade = item.quantidade;
+                novoPedido.itens.push(itemPedido);
+            }
+        }
 
-        novoPedido.itens.push(itemPedido);
+        if (!erroProduto) {
+            const resultado = await pedidoRepo.save(novoPedido);
+            res.json(resultado);
+        }
     }
+});
 
-    const resultado = await pedidoRepo.save(novoPedido);
-    res.json(resultado);
+router.get("/", async (req: Request, res: Response) => {
+    const pedidos = await pedidoRepo.find({ relations: ["restaurante", "itens", "itens.produto"] });
+    res.json(pedidos);
 });
 
 export default router;

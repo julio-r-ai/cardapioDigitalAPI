@@ -5,15 +5,15 @@ import { AppDataSource } from "../data-source";
 const router = Router();
 const restauranteRepo = AppDataSource.getRepository(Restaurante);
 
-router.get("/", async (req, res) => {
-    const restaurantes = await restauranteRepo.find({ relations: ["categorias"] });
-    res.json(restaurantes);
-});
-
 router.post("/", async (req, res) => {
     const restaurante = restauranteRepo.create(req.body);
     const result = await restauranteRepo.save(restaurante);
     res.json(result);
+});
+
+router.get("/", async (req, res) => {
+    const restaurantes = await restauranteRepo.find({ relations: ["categorias"] });
+    res.json(restaurantes);
 });
 
 export default router;
