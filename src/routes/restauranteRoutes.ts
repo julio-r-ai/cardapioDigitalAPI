@@ -16,4 +16,12 @@ router.get("/", async (req, res) => {
     res.json(restaurantes);
 });
 
+router.put("/", (req, res) => {
+  res.send("Lista de produtos");
+});
+
+router.delete("/", (req, res) => {
+  res.send("Lista de produtos");
+});
+
 export default router;

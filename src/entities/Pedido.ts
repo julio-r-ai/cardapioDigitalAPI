@@ -16,6 +16,6 @@ export class Pedido {
     @Column()
     status!: string;  // Ex: "Pendente", "Preparando", "Finalizado"
 
-    @OneToMany(() => ItemPedido, item => item.pedido, { cascade: true })
+    @OneToMany(() => ItemPedido, item => item.pedido, { cascade: true, onDelete: "CASCADE" })
     itens!: ItemPedido[];
 }

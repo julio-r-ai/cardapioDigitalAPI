@@ -13,6 +13,7 @@ app.use("/restaurantes", restauranteRoutes);
 app.use("/categorias", categoriaRoutes);
 app.use("/produtos", produtoRoutes);
 app.use("/pedidos", pedidoRoutes);
+app.use("/pedidos/:id", pedidoRoutes);
 
 const PORT = 3000;
 
