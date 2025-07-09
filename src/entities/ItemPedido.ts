@@ -10,7 +10,7 @@ export class ItemPedido {
     @ManyToOne(() => Produto)
     produto!: Produto;
 
-    @ManyToOne(() => Pedido, pedido => pedido.itens)
+    @ManyToOne(() => Pedido, pedido => pedido.itens, { onDelete: "CASCADE" })
     pedido!: Pedido;
 
     @Column()
