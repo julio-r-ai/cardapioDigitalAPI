@@ -1,20 +1,21 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn} from "typeorm";
 import { Categoria } from "./Categoria";
 
 @Entity()
 export class Produto {
-    @PrimaryGeneratedColumn()
-    id!: number;
+  @PrimaryGeneratedColumn()
+  id!: number;
 
-    @Column()
-    nome!: string;
+  @Column()
+  nome!: string;
 
-    @Column()
-    descricao!: string;
+  @Column()
+  descricao!: string;
 
-    @Column("decimal", { precision: 10, scale: 2 })
-    preco!: number;
+  @Column("decimal", { precision: 10, scale: 2 })
+  preco!: number;
 
-    @ManyToOne(() => Categoria, categoria => categoria.produtos)
-    categoria!: Categoria;
+  @ManyToOne(() => Categoria, categoria => categoria.produtos)
+  @JoinColumn({ name: "categoriaId" }) 
+  categoria!: Categoria;
 }
