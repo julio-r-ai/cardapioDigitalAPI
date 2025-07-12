@@ -15,7 +15,8 @@ export class Produto {
   @Column("decimal", { precision: 10, scale: 2 })
   preco!: number;
 
-  @ManyToOne(() => Categoria, categoria => categoria.produtos)
-  @JoinColumn({ name: "categoriaId" }) 
+  @ManyToOne(() => Categoria, { onDelete: "CASCADE" })
+  @JoinColumn({ name: "categoriaId" })
   categoria!: Categoria;
+
 }
