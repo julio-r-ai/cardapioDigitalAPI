@@ -13,6 +13,7 @@ app.use("/restaurantes", restauranteRoutes);
 app.use("/categorias", categoriaRoutes);
 app.use("/categorias/:id", categoriaRoutes);
 app.use("/produtos", produtoRoutes);
+app.use("/produtos/:id", produtoRoutes);
 app.use("/pedidos", pedidoRoutes);
 app.use("/pedidos/:id", pedidoRoutes);
 
