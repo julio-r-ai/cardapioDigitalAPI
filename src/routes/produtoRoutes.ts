@@ -44,7 +44,6 @@ router.get("/:id", async (req: Request, res: Response) => {
   }
 });
 
-// PUT - Atualizar produto
 router.put("/:id", async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
   const { nome, descricao, preco, categoriaId } = req.body;
@@ -56,7 +55,7 @@ router.put("/:id", async (req: Request, res: Response): Promise<void> => {
 
   if (!produto) {
     res.status(404).json({ message: "Produto não encontrado" });
-    return; // ✅ Evita continuar com 'produto' como undefined
+    return; 
   }
 
   if (nome) produto.nome = nome;
@@ -67,7 +66,7 @@ router.put("/:id", async (req: Request, res: Response): Promise<void> => {
     const categoria = await categoriaRepo.findOneBy({ id: Number(categoriaId) });
     if (!categoria) {
       res.status(404).json({ message: "Categoria não encontrada" });
-      return; // ✅ Evita continuar com 'categoria' undefined
+      return; 
     }
     produto.categoria = categoria;
   }
@@ -76,18 +75,18 @@ router.put("/:id", async (req: Request, res: Response): Promise<void> => {
   res.json(result);
 });
 
-// DELETE - Remover produto
-/* router.delete("/:id", async (req: Request, res: Response) => {
+router.delete("/:id", async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
 
   const produto = await produtoRepo.findOneBy({ id: Number(id) });
 
   if (!produto) {
     res.status(404).json({ message: "Produto não encontrado" });
+    return
   }
 
   await produtoRepo.remove(produto);
   res.json({ message: "Produto deletado com sucesso" });
-}); */
+}); 
 
 export default router;
