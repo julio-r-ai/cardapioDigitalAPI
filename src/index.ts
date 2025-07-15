@@ -10,6 +10,7 @@ const app = express();
 app.use(express.json());
 
 app.use("/restaurantes", restauranteRoutes);
+app.use("/restaurantes/:id", restauranteRoutes);
 app.use("/categorias", categoriaRoutes);
 app.use("/categorias/:id", categoriaRoutes);
 app.use("/produtos", produtoRoutes);
