@@ -17,6 +17,8 @@ app.use("/produtos", produtoRoutes);
 app.use("/produtos/:id", produtoRoutes);
 app.use("/pedidos", pedidoRoutes);
 app.use("/pedidos/:id", pedidoRoutes);
+app.use("/pedidos/:id/status", pedidoRoutes);
+app.use("/pedidos/status/:status", pedidoRoutes);
 
 const PORT = 3000;
 

@@ -69,6 +69,17 @@ router.get("/:id", async (req: Request, res: Response) => {
     }
 });
 
+router.get("/status/:status", async (req: Request, res: Response) => {
+    const { status } = req.params;
+
+    const pedidos = await pedidoRepo.find({
+        where: { status },
+        relations: ["restaurante", "itens", "itens.produto"]
+    });
+
+    res.json(pedidos);
+});
+
 router.put("/:id", async (req: Request, res: Response) => {
     const { id } = req.params;
     const { status, itens } = req.body;
@@ -106,6 +117,30 @@ router.put("/:id", async (req: Request, res: Response) => {
         const resultado = await pedidoRepo.save(pedido);
         res.json(resultado);
     }
+});
+
+router.put("/:id/status", async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const pedido = await pedidoRepo.findOneBy({ id: Number(id) });
+
+    if (!pedido){
+        res.status(404).json({ message: "Pedido não encontrado" });
+        return 
+    } 
+
+    const statusValidos = ["Pendente", "Preparando", "Pronto", "Finalizado", "Cancelado"];
+
+    if (!statusValidos.includes(status)) {
+        res.status(400).json({ message: "Status inválido" });
+        return
+    }
+
+    pedido.status = status;
+    const result = await pedidoRepo.save(pedido);
+
+    res.json(result);
 });
 
 router.delete("/:id", async (req: Request, res: Response) => {
