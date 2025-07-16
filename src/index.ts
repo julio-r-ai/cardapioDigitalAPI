@@ -13,7 +13,6 @@ app.use(express.json());
 app.use("/auth", authRoutes);
 app.use("/auth/register", authRoutes);
 
-
 app.use("/restaurantes", restauranteRoutes);
 app.use("/restaurantes/:id", restauranteRoutes);
 app.use("/categorias", categoriaRoutes);
