@@ -2,10 +2,19 @@ import { Router, Request, Response } from "express";
 import { Produto } from "../entities/Produto";
 import { Categoria } from "../entities/Categoria";
 import { AppDataSource } from "../data-source";
+import { authMiddleware } from "../middleware/authMiddleware";
 
 const router = Router();
 const produtoRepo = AppDataSource.getRepository(Produto);
 const categoriaRepo = AppDataSource.getRepository(Categoria);
+
+
+
+/* router.post("/", authMiddleware, async (req: Request, res:  Response) => {
+    // Somente usuários autenticados podem criar produtos
+}); */
+
+
 
 router.post("/", async (req: Request, res: Response) => {
   const { nome, descricao, preco, categoriaId } = req.body;

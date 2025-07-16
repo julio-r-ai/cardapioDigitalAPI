@@ -4,6 +4,7 @@ import { Categoria } from "./entities/Categoria";
 import { Produto } from "./entities/Produto";
 import { Pedido } from "./entities/Pedido";
 import { ItemPedido } from "./entities/ItemPedido";
+import { Usuario } from "./entities/Usuario";
 
 import * as dotenv from "dotenv";
 
@@ -18,5 +19,5 @@ export const AppDataSource = new DataSource({
     database: process.env.DB_NAME,
     synchronize: true,
     logging: true,
-    entities: [Restaurante, Categoria, Produto, Pedido, ItemPedido],
+    entities: [Restaurante, Categoria, Produto, Pedido, ItemPedido, Usuario],
 });

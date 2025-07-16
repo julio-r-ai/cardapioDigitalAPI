@@ -5,9 +5,14 @@ import restauranteRoutes from './routes/restauranteRoutes';
 import categoriaRoutes from './routes/categoriaRoutes';
 import produtoRoutes from './routes/produtoRoutes';
 import pedidoRoutes from './routes/pedidoRoutes';
+import authRoutes from './routes/authRoutes';
 
 const app = express();
 app.use(express.json());
+
+app.use("/auth", authRoutes);
+app.use("/auth/register", authRoutes);
+
 
 app.use("/restaurantes", restauranteRoutes);
 app.use("/restaurantes/:id", restauranteRoutes);
