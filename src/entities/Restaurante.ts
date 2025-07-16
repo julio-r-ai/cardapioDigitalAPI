@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from "typeorm";
 import { Categoria } from "./Categoria";
+import { Usuario } from "./Usuario";
 
 @Entity()
 export class Restaurante {
@@ -14,6 +15,9 @@ export class Restaurante {
 
     @Column()
     logoUrl!: string;
+
+    @ManyToOne(() => Usuario, { eager: true })
+    usuario!: Usuario;
 
     @OneToMany(() => Categoria, categoria => categoria.restaurante)
     categorias!: Categoria[];

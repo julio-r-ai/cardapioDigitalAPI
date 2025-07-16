@@ -1,16 +1,41 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, NextFunction } from "express";
 import { Restaurante } from "../entities/Restaurante";
 import { AppDataSource } from "../data-source";
+import { authMiddleware } from "../middleware/authMiddleware";
+import { Usuario } from "../entities/Usuario";
 
 const router = Router();
 const restauranteRepo = AppDataSource.getRepository(Restaurante);
 
-router.post("/", async (req, res) => {
-    const restaurante = restauranteRepo.create(req.body);
+router.post("/", authMiddleware, async (req: Request, res: Response, next: NextFunction)=> {
+    const { nome, descricao, logoUrl } = req.body;
+    const userId = (req as any).user.userId;
+
+    const usuarioRepo = AppDataSource.getRepository(Usuario);
+    const usuario = await usuarioRepo.findOneBy({ id: userId });
+
+    if (!usuario){
+      res.status(404).json({ message: "Usuário não encontrado" });
+      return
+    }
+
+    const restaurante = restauranteRepo.create({
+        nome,
+        descricao,
+        logoUrl,
+        usuario
+    });
 
     const result = await restauranteRepo.save(restaurante);
     res.json(result);
 });
+
+/* router.post("/", async (req, res) => {
+    const restaurante = restauranteRepo.create(req.body);
+
+    const result = await restauranteRepo.save(restaurante);
+    res.json(result);
+}); */
 
 router.get("/", async (req, res) => {
   const restaurantes = await restauranteRepo.find();

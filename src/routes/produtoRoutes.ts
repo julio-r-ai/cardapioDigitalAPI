@@ -8,14 +8,6 @@ const router = Router();
 const produtoRepo = AppDataSource.getRepository(Produto);
 const categoriaRepo = AppDataSource.getRepository(Categoria);
 
-
-
-/* router.post("/", authMiddleware, async (req: Request, res:  Response) => {
-    // Somente usuários autenticados podem criar produtos
-}); */
-
-
-
 router.post("/", async (req: Request, res: Response) => {
   const { nome, descricao, preco, categoriaId } = req.body;
 
