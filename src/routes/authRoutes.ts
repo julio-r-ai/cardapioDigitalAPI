@@ -3,6 +3,7 @@ import { AppDataSource } from "../data-source";
 import { Usuario } from "../entities/Usuario";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { authMiddleware } from "../middleware/authMiddleware";
 
 const router = Router();
 const usuarioRepo = AppDataSource.getRepository(Usuario);
@@ -45,6 +46,31 @@ router.post("/login", async (req: Request, res: Response) => {
     );
 
     res.json({ token });
+});
+
+router.put("/trocar-senha", authMiddleware, async (req: Request, res: Response) => {
+    const { senhaAtual, novaSenha } = req.body;
+    const userId = (req as any).user.userId;
+
+    const usuarioRepo = AppDataSource.getRepository(Usuario);
+    const usuario = await usuarioRepo.findOneBy({ id: userId });
+
+    if (!usuario){
+        res.status(404).json({ message: "Usuário não encontrado" });
+        return
+    }
+    
+    const senhaConfere = await bcrypt.compare(senhaAtual, usuario.senha);
+    if (!senhaConfere){
+        res.status(401).json({ message: "Senha atual incorreta" });
+        return
+    }
+    
+    const novaSenhaHash = await bcrypt.hash(novaSenha, 10);
+    usuario.senha = novaSenhaHash;
+
+    await usuarioRepo.save(usuario);
+    res.json({ message: "Senha alterada com sucesso" });
 });
 
 export default router;
