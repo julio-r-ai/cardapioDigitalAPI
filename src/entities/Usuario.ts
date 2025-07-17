@@ -13,4 +13,10 @@ export class Usuario {
 
     @Column()
     nome!: string;
+    
+    @Column({ type: "varchar", length: 255, nullable: true })
+    resetToken!: string | null;
+
+    @Column({ type: "datetime", nullable: true })
+    resetTokenExpira!: Date | null;
 }
