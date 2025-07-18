@@ -7,6 +7,15 @@ export class Pedido {
     @PrimaryGeneratedColumn()
     id!: number;
 
+    @Column()
+    nomeCompleto!: string;
+
+    @Column()
+    whatsapp!: string;
+
+    @Column({ nullable: true })
+    observacao!: string;
+
     @ManyToOne(() => Restaurante)
     restaurante!: Restaurante;
 
@@ -14,7 +23,7 @@ export class Pedido {
     dataHora!: Date;
 
     @Column()
-    status!: string;  // Ex: "Pendente", "Preparando", "Finalizado"
+    status!: string; 
 
     @OneToMany(() => ItemPedido, item => item.pedido, { cascade: true, onDelete: "CASCADE" })
     itens!: ItemPedido[];

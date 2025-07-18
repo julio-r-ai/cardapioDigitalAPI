@@ -11,6 +11,43 @@ const restauranteRepo = AppDataSource.getRepository(Restaurante);
 const produtoRepo = AppDataSource.getRepository(Produto);
 
 router.post("/", async (req: Request, res: Response) => {
+  const { nomeCompleto, whatsapp, restauranteId, itens, observacao } = req.body;
+
+  const restauranteRepo = AppDataSource.getRepository(Restaurante);
+  const pedidoRepo = AppDataSource.getRepository(Pedido);
+  const produtoRepo = AppDataSource.getRepository(Produto);
+
+  const restaurante = await restauranteRepo.findOneBy({ id: restauranteId });
+  if (!restaurante){
+    res.status(404).json({ message: "Restaurante não encontrado" });
+    return
+  }  
+
+  const pedido = new Pedido();
+  pedido.nomeCompleto = nomeCompleto;
+  pedido.whatsapp = whatsapp;
+  pedido.restaurante = restaurante;
+  pedido.observacao = observacao;
+
+  pedido.itens = [];
+
+  for (const item of itens) {
+    const produto = await produtoRepo.findOneBy({ id: item.produtoId });
+    if (!produto) continue;
+
+    const itemPedido = new ItemPedido();
+    itemPedido.produto = produto;
+    itemPedido.quantidade = item.quantidade;
+    pedido.itens.push(itemPedido);
+  }
+
+  await pedidoRepo.save(pedido);
+
+  res.status(201).json({ message: "Pedido realizado com sucesso", pedido });
+});
+
+
+/* router.post("/", async (req: Request, res: Response) => {
 
     const { restauranteId, itens } = req.body;
 
@@ -47,7 +84,7 @@ router.post("/", async (req: Request, res: Response) => {
         }
     }
 
-});
+}); */
 
 router.get("/", async (req: Request, res: Response) => {
     const pedidos = await pedidoRepo.find({ relations: ["restaurante", "itens", "itens.produto"] });
