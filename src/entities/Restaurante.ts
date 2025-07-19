@@ -16,6 +16,9 @@ export class Restaurante {
     @Column()
     logoUrl!: string;
 
+    @Column({ type: "varchar", length: 20 })
+    numeroWhatsapp!: string;
+
     @ManyToOne(() => Usuario, { eager: true })
     usuario!: Usuario;
 

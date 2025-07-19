@@ -1,6 +1,6 @@
 import { AppDataSource } from "../data-source";
 import { Pedido } from "../entities/Pedido";
-import { PedidoItem } from "../entities/PedidoItem";
+import { ItemPedido } from "../entities/ItemPedido";
 import { Produto } from "../entities/Produto";
 import { Restaurante } from "../entities/Restaurante";
 
@@ -15,7 +15,7 @@ interface NovoPedidoInput {
 
 export const criarPedidoComLink = async (dados: NovoPedidoInput) => {
   const pedidoRepo = AppDataSource.getRepository(Pedido);
-  const itemRepo = AppDataSource.getRepository(PedidoItem);
+  const itemRepo = AppDataSource.getRepository(ItemPedido);
   const produtoRepo = AppDataSource.getRepository(Produto);
   const restauranteRepo = AppDataSource.getRepository(Restaurante);
 
@@ -26,8 +26,7 @@ export const criarPedidoComLink = async (dados: NovoPedidoInput) => {
   if (!restaurante) throw new Error("Restaurante não encontrado");
 
   const pedido = pedidoRepo.create({
-    nome: dados.nome,
-    sobrenome: dados.sobrenome,
+    nomeCompleto: dados.nome,
     whatsapp: dados.whatsapp,
     observacao: dados.observacao,
     restaurante,
@@ -63,7 +62,7 @@ function gerarLinkWhatsapp(pedido: Pedido, restaurante: Restaurante): string {
   }).join("\n");
 
   const mensagem = `
-Olá, meu nome é ${pedido.nome} ${pedido.sobrenome}.
+Olá, meu nome é ${pedido.nomeCompleto}.
 Gostaria de fazer um pedido:
 
 ${itensTexto}
@@ -75,4 +74,4 @@ Meu número de WhatsApp: ${pedido.whatsapp}
 
   const textoCodificado = encodeURIComponent(mensagem);
   return `https://wa.me/${numeroDestino}?text=${textoCodificado}`;
-}
+} 
