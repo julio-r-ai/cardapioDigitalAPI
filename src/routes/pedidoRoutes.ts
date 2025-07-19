@@ -46,7 +46,6 @@ router.post("/", async (req: Request, res: Response) => {
   res.status(201).json({ message: "Pedido realizado com sucesso", pedido });
 });
 
-
 /* router.post("/", async (req: Request, res: Response) => {
 
     const { restauranteId, itens } = req.body;
