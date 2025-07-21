@@ -5,8 +5,7 @@ import { Produto } from "../entities/Produto";
 import { Restaurante } from "../entities/Restaurante";
 
 interface NovoPedidoInput {
-  nome: string;
-  sobrenome: string;
+  nomeCompleto: string; // <-- atualize para bater com o campo real
   whatsapp: string;
   observacao?: string;
   restauranteId: number;
@@ -26,7 +25,7 @@ export const criarPedidoComLink = async (dados: NovoPedidoInput) => {
   if (!restaurante) throw new Error("Restaurante não encontrado");
 
   const pedido = pedidoRepo.create({
-    nomeCompleto: dados.nome,
+    nomeCompleto: dados.nomeCompleto,
     whatsapp: dados.whatsapp,
     observacao: dados.observacao,
     restaurante,

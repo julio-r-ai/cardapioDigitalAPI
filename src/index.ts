@@ -24,7 +24,7 @@ app.use("/pedidos", pedidoRoutes);
 app.use("/pedidos/:id", pedidoRoutes);
 app.use("/pedidos/:id/status", pedidoRoutes);
 app.use("/pedidos/status/:status", pedidoRoutes);
-app.use("/pedidos", criarPedido);
+app.use("/pedidoWhats", criarPedido);
 
 const PORT = 3000;
 

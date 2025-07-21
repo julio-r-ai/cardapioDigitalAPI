@@ -25,6 +25,10 @@ export class Pedido {
     @Column()
     status!: string; 
 
-    @OneToMany(() => ItemPedido, item => item.pedido, { cascade: true, onDelete: "CASCADE" })
+    /* @OneToMany(() => ItemPedido, item => item.pedido, { cascade: true, onDelete: "CASCADE" }) */
+    @OneToMany(() => ItemPedido, item => item.pedido, {
+        cascade: ['insert', 'update'], // ou só 'insert'
+        eager: true // opcional, se quiser que sempre venha com os itens
+    })
     itens!: ItemPedido[];
 }
