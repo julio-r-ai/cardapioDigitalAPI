@@ -5,7 +5,7 @@ import { Produto } from "../entities/Produto";
 import { Restaurante } from "../entities/Restaurante";
 
 interface NovoPedidoInput {
-  nomeCompleto: string; // <-- atualize para bater com o campo real
+  nomeCompleto: string;
   whatsapp: string;
   observacao?: string;
   restauranteId: number;
@@ -24,7 +24,6 @@ export const criarPedidoComLink = async (dados: NovoPedidoInput) => {
 
   if (!restaurante) throw new Error("Restaurante não encontrado");
 
-  // cria o pedido
   const pedido = pedidoRepo.create({
     nomeCompleto : dados.nomeCompleto,
     whatsapp     : dados.whatsapp,
@@ -32,7 +31,6 @@ export const criarPedidoComLink = async (dados: NovoPedidoInput) => {
     restaurante
   });
 
-  // monta os itens
   pedido.itens = await Promise.all(
     dados.itens.map(async i => {
       const produto = await produtoRepo.findOneBy({ id: i.produtoId });
@@ -41,15 +39,12 @@ export const criarPedidoComLink = async (dados: NovoPedidoInput) => {
       return itemRepo.create({
         produto,
         quantidade: i.quantidade,
-        // não precisa setar pedido: o push virá do array
       });
     })
   );
 
-  // **um único save; o cascade insere pedido e itens**
   const pedidoSalvo = await pedidoRepo.save(pedido);
-
-  // Gerar link WhatsApp
+  // Gera o link WhatsApp
   const linkWhatsapp = gerarLinkWhatsapp(pedido, restaurante);
 
   return { pedido, linkWhatsapp };
