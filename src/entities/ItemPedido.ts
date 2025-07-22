@@ -11,9 +11,15 @@ export class ItemPedido {
     @JoinColumn({ name: "produtoId" })
     produto!: Produto;
 
-    @ManyToOne(() => Pedido, pedido => pedido.itens, { onDelete: "CASCADE" })
+    /* @ManyToOne(() => Pedido, pedido => pedido.itens, { onDelete: "CASCADE" })
+    pedido!: Pedido; */
+    @ManyToOne(() => Pedido, pedido => pedido.itens, {
+    onDelete: "CASCADE",
+    nullable: false
+    })
+    @JoinColumn({ name: "pedidoId" })
     pedido!: Pedido;
-
+    
     @Column()
     quantidade!: number;
 }

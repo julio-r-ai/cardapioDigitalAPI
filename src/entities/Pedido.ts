@@ -27,8 +27,8 @@ export class Pedido {
 
     /* @OneToMany(() => ItemPedido, item => item.pedido, { cascade: true, onDelete: "CASCADE" }) */
     @OneToMany(() => ItemPedido, item => item.pedido, {
-        cascade: ['insert', 'update'], // ou só 'insert'
-        eager: true // opcional, se quiser que sempre venha com os itens
+    cascade: ['insert'],   // salvamos itens junto com o pedido
+    eager: true            // opcional: sempre carregar itens
     })
     itens!: ItemPedido[];
 }

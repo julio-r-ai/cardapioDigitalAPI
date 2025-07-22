@@ -24,29 +24,30 @@ export const criarPedidoComLink = async (dados: NovoPedidoInput) => {
 
   if (!restaurante) throw new Error("Restaurante não encontrado");
 
+  // cria o pedido
   const pedido = pedidoRepo.create({
-    nomeCompleto: dados.nomeCompleto,
-    whatsapp: dados.whatsapp,
-    observacao: dados.observacao,
-    restaurante,
+    nomeCompleto : dados.nomeCompleto,
+    whatsapp     : dados.whatsapp,
+    observacao   : dados.observacao,
+    restaurante
   });
 
-  pedido.itens = [];
+  // monta os itens
+  pedido.itens = await Promise.all(
+    dados.itens.map(async i => {
+      const produto = await produtoRepo.findOneBy({ id: i.produtoId });
+      if (!produto) throw new Error(`Produto ${i.produtoId} não encontrado`);
 
-  for (const item of dados.itens) {
-    const produto = await produtoRepo.findOneBy({ id: item.produtoId });
-    if (!produto) continue;
+      return itemRepo.create({
+        produto,
+        quantidade: i.quantidade,
+        // não precisa setar pedido: o push virá do array
+      });
+    })
+  );
 
-    const novoItem = itemRepo.create({
-      produto,
-      quantidade: item.quantidade,
-      pedido,
-    });
-
-    pedido.itens.push(novoItem);
-  }
-
-  await pedidoRepo.save(pedido);
+  // **um único save; o cascade insere pedido e itens**
+  const pedidoSalvo = await pedidoRepo.save(pedido);
 
   // Gerar link WhatsApp
   const linkWhatsapp = gerarLinkWhatsapp(pedido, restaurante);
