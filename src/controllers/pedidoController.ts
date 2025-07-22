@@ -94,13 +94,15 @@ export const pedidoControllers = {
     res.json(pedidos);
   },
 
+  //Alterar Pedido não está atuallizado. Precisa ser concertado
   alterarPedido: async (req: Request, res: Response) => {
     const { id } = req.params;
     const { status, itens } = req.body;
 
+    // Busca o pedido com relações
     const pedido = await pedidoRepo.findOne({
       where: { id: Number(id) },
-      relations: ["restaurante", "itens", "itens.produto"]
+      relations: ["restaurante", "itens", "itens.produto"],
     });
 
     if (!pedido) {
@@ -108,12 +110,16 @@ export const pedidoControllers = {
       return
     }
 
+    // Atualiza status diretamente (garante execução no banco)
     if (status) {
-      pedido.status = status;
+      console.log("ID do pedido:", pedido.id, "Tipo:", typeof pedido.id);
+      const resultadoUpdate = await pedidoRepo.update(pedido.id, { status });
+      console.log("Status atualizado?", resultadoUpdate);
     }
 
+    // Se forem passados novos itens, atualiza
     if (itens && Array.isArray(itens)) {
-      // Remove itens antigos
+      // Remove todos os itens antigos vinculados ao pedido
       await itemPedidoRepo.delete({ pedido: { id: pedido.id } });
 
       const novosItens: ItemPedido[] = [];
@@ -126,47 +132,31 @@ export const pedidoControllers = {
           return
         }
 
-        const itemPedido = itemPedidoRepo.create({
+        const novoItem = itemPedidoRepo.create({
           produto,
           quantidade: item.quantidade,
-          pedido
+          pedido: pedido, // vincula ao pedido atual
         });
 
-        novosItens.push(itemPedido);
+        novosItens.push(novoItem);
       }
 
+      // Salva todos os novos itens vinculados
       await itemPedidoRepo.save(novosItens);
+
+      // (Opcional) Atualiza lista de itens no objeto em memória
       pedido.itens = novosItens;
-    };
+    }
 
-    const pedidoAtualizado = await pedidoRepo.save(pedido);
-    console.log("Pedido antes de salvar:", pedido);
-
-    // 🔒 Resposta formatada (sem referência circular)
-    res.json({
-      id: pedidoAtualizado.id,
-      nomeCompleto: pedidoAtualizado.nomeCompleto,
-      whatsapp: pedidoAtualizado.whatsapp,
-      observacao: pedidoAtualizado.observacao,
-      status: pedidoAtualizado.status,
-      dataHora: pedidoAtualizado.dataHora,
-      restaurante: {
-        id: pedidoAtualizado.restaurante.id,
-        nome: pedidoAtualizado.restaurante.nome
-      },
-      itens: pedidoAtualizado.itens.map(item => ({
-        id: item.id,
-        quantidade: item.quantidade,
-        produto: {
-          id: item.produto.id,
-          nome: item.produto.nome,
-          preco: item.produto.preco
-        }
-      }))
+    // Retorna o pedido atualizado
+    const pedidoAtualizado = await pedidoRepo.findOne({
+      where: { id: pedido.id },
+      relations: ["itens", "itens.produto"],
     });
+
+    res.json(pedidoAtualizado);
   },
 
-  
   alterarStatus: async (req: Request, res: Response) => {
     const { id } = req.params;
     const { status } = req.body;

@@ -1,97 +1,17 @@
-import { Router, Request, Response } from "express";
-import { AppDataSource } from "../data-source";
-import { Categoria } from "../entities/Categoria";
-import { Restaurante } from "../entities/Restaurante";
+import { Router } from "express";
+
+import { categoriaControllers } from "../controllers/categoriaController";
 
 const router = Router();
-const categoriaRepo = AppDataSource.getRepository(Categoria);
-const restauranteRepo = AppDataSource.getRepository(Restaurante);
 
-router.post("/", async (req: Request, res: Response) => {
-  
-  const { nome, restauranteId } = req.body;
+router.post("/", categoriaControllers.criarCategorias);
 
-  const restaurante = await restauranteRepo.findOneBy({ id: Number(restauranteId) });
+router.get('/', categoriaControllers.buscarCategorias);
 
-  if (!restaurante) {
-    res.status(404).json({ message: "Restaurante não encontrado" });
-  } else {
-    const categoria = categoriaRepo.create({
-      nome,
-      restaurante,
-    });
+router.get('/:id', categoriaControllers.buscarCategoria);
 
-    const resultado = await categoriaRepo.save(categoria);
-    res.json(resultado);
-  }
+router.put('/:id', categoriaControllers.alterarCategoria);
 
-});
-
-router.get('/', async (req: Request, res: Response)=>{
-  const categorias = await categoriaRepo.find({ relations: ['restaurante'], });
-
-  res.json(categorias);
-});
-
-router.get('/:id', async (req: Request, res: Response)=>{
-  const { id } = req.params;
-
-  const categoria = await categoriaRepo.findOne({
-    where:{id: Number(id)},
-    relations: ['restaurante']
-  });
-
-  if(!categoria){
-    res.status(404).json({message: "Categoria não encontrada"});
-  }else{
-    res.json(categoria);
-  }
-});
-
-router.put('/:id', async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const { nome, restauranteId } = req.body;
-
-  const categoria = await categoriaRepo.findOne({
-    where: { id: Number(id) },
-    relations: ['restaurante']
-  });
-
-  if (!categoria) {
-    res.status(404).json({ message: 'Categoria não encontrada' });
-    return;
-  }
-
-  if (nome) {
-    categoria.nome = nome;
-  }
-
-  if (restauranteId) {
-    const restaurante = await restauranteRepo.findOneBy({ id: Number(restauranteId) });
-    if (!restaurante) {
-      res.status(404).json({ message: 'Restaurante não encontrado' });
-      return;
-    }
-    categoria.restaurante = restaurante;
-  }
-
-  const resultado = await categoriaRepo.save(categoria);
-  res.json(resultado);
-});
-
-router.delete('/:id', async (req: Request, res: Response) => {
-  const { id } = req.params;
-
-  const categoria = await categoriaRepo.findOneBy({ id: Number(id) });
-
-  if (!categoria) {
-    res.status(404).json({ message: 'Categoria não encontrada' });
-    return;
-  }
-
-  await categoriaRepo.remove(categoria);
-
-  res.json({ message: 'Categoria deletada com sucesso' });
-});
+router.delete('/:id', categoriaControllers.deletarCategoria);
 
 export default router;
