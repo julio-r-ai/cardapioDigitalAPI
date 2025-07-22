@@ -6,7 +6,7 @@ import categoriaRoutes from './routes/categoriaRoutes';
 import produtoRoutes from './routes/produtoRoutes';
 import pedidoRoutes from './routes/pedidoRoutes';
 import authRoutes from './routes/authRoutes';
-import { criarPedidoWhatsApp } from "./controllers/pedidoController";
+import { pedidoControllers } from "./controllers/pedidoController";
 
 const app = express();
 app.use(express.json());
@@ -25,7 +25,7 @@ app.use("/pedidos/:id", pedidoRoutes);
 app.use("/pedidos/:id/status", pedidoRoutes);
 app.use("/pedidos/status/:status", pedidoRoutes);
 
-app.use("/pedidoWhats", criarPedidoWhatsApp);
+app.use("/pedidoWhats", pedidoControllers.criarPedidoWhatsApp);
 
 const PORT = 3000;
 
