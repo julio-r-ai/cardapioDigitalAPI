@@ -10,7 +10,7 @@ export class Categoria {
     @Column()
     nome!: string;
 
-    @ManyToOne(() => Restaurante, restaurante => restaurante.categorias)
+    @ManyToOne(() => Restaurante, restaurante => restaurante.categoria)
     restaurante!: Restaurante;
 
     @OneToMany(() => Produto, produto => produto.categoria)

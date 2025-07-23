@@ -9,6 +9,7 @@ import { ItemPedido } from "../entities/ItemPedido";
 const pedidoRepo = AppDataSource.getRepository(Pedido);
 const produtoRepo = AppDataSource.getRepository(Produto);
 const itemPedidoRepo = AppDataSource.getRepository(ItemPedido);
+const restauranteRepo = AppDataSource.getRepository(Restaurante);
 
 export const pedidoControllers = {
 
@@ -94,12 +95,17 @@ export const pedidoControllers = {
     res.json(pedidos);
   },
 
-  //Alterar Pedido não está atuallizado. Precisa ser concertado
   alterarPedido: async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { status, itens } = req.body;
+    const {
+      status,
+      nomeCompleto,
+      whatsapp,
+      observacao,
+      restauranteId,
+      itens
+    } = req.body;
 
-    // Busca o pedido com relações
     const pedido = await pedidoRepo.findOne({
       where: { id: Number(id) },
       relations: ["restaurante", "itens", "itens.produto"],
@@ -110,49 +116,46 @@ export const pedidoControllers = {
       return
     }
 
-    // Atualiza status diretamente (garante execução no banco)
-    if (status) {
-      console.log("ID do pedido:", pedido.id, "Tipo:", typeof pedido.id);
-      const resultadoUpdate = await pedidoRepo.update(pedido.id, { status });
-      console.log("Status atualizado?", resultadoUpdate);
+    if (status) pedido.status = status;
+    if (nomeCompleto) pedido.nomeCompleto = nomeCompleto;
+    if (whatsapp) pedido.whatsapp = whatsapp;
+    if (observacao) pedido.observacao = observacao;
+
+    if (restauranteId) {
+      const restaurante = await restauranteRepo.findOneBy({ id: restauranteId });
+      if (!restaurante) {
+        res.status(404).json({ message: "Restaurante não encontrado" });
+        return
+      }
+      pedido.restaurante = restaurante;
     }
 
-    // Se forem passados novos itens, atualiza
-    if (itens && Array.isArray(itens)) {
-      // Remove todos os itens antigos vinculados ao pedido
+    if (Array.isArray(itens)) {
       await itemPedidoRepo.delete({ pedido: { id: pedido.id } });
 
       const novosItens: ItemPedido[] = [];
 
       for (const item of itens) {
-        const produto = await produtoRepo.findOneBy({ id: Number(item.produtoId) });
-
+        const produto = await produtoRepo.findOneBy({ id: item.produtoId });
         if (!produto) {
           res.status(404).json({ message: `Produto ID ${item.produtoId} não encontrado` });
           return
         }
 
         const novoItem = itemPedidoRepo.create({
+          pedido,
           produto,
-          quantidade: item.quantidade,
-          pedido: pedido, // vincula ao pedido atual
+          quantidade: item.quantidade
         });
 
         novosItens.push(novoItem);
       }
 
-      // Salva todos os novos itens vinculados
       await itemPedidoRepo.save(novosItens);
-
-      // (Opcional) Atualiza lista de itens no objeto em memória
       pedido.itens = novosItens;
     }
 
-    // Retorna o pedido atualizado
-    const pedidoAtualizado = await pedidoRepo.findOne({
-      where: { id: pedido.id },
-      relations: ["itens", "itens.produto"],
-    });
+    const pedidoAtualizado = await pedidoRepo.save(pedido);
 
     res.json(pedidoAtualizado);
   },

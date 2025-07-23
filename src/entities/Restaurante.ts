@@ -23,5 +23,5 @@ export class Restaurante {
     usuario!: Usuario;
 
     @OneToMany(() => Categoria, categoria => categoria.restaurante)
-    categorias!: Categoria[];
+    categoria!: Categoria[];
 }

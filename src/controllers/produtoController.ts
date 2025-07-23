@@ -14,12 +14,12 @@ export const produtoControllers = {
       const produto = produtoRepo.create({
         nome,
         descricao,
-        preco
+        preco,
+        categoriaId: categoriaId
       });
     
       const result = await produtoRepo.save(produto);
       res.status(201).json(result);
-      console.log("Produto salvo:", result);
     },
 
     buscarProdutos: async (req: Request, res: Response) => {
@@ -69,7 +69,7 @@ export const produtoControllers = {
             res.status(404).json({ message: "Categoria não encontrada" });
             return; 
             }
-            produto.categoria = categoria;
+            produto.categoriaId = categoriaId;
         }
 
         const result = await produtoRepo.save(produto);
