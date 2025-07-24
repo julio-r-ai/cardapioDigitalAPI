@@ -5,6 +5,8 @@ import { Pedido } from "../entities/Pedido";
 import { Restaurante } from "../entities/Restaurante";
 import { Produto } from "../entities/Produto";
 import { ItemPedido } from "../entities/ItemPedido";
+import { Usuario } from "../entities/Usuario";
+import { In } from 'typeorm'; 
 
 const pedidoRepo = AppDataSource.getRepository(Pedido);
 const produtoRepo = AppDataSource.getRepository(Produto);
@@ -195,6 +197,43 @@ export const pedidoControllers = {
         await pedidoRepo.remove(pedido);
         res.json({ message: "Pedido deletado com sucesso" });
     }
-  }
+  },
+
+  listarPorRestaurante: async (req: Request, res: Response) => {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      res.status(401).json({ mensagem: 'Usuário não autenticado' });
+      return
+    }
+
+    try {
+      const restaurantes = await AppDataSource.getRepository(Restaurante).find({
+        where: { usuario: { id: userId } }
+      });
+
+      if (restaurantes.length === 0) {
+        res.status(403).json({ mensagem: 'Nenhum restaurante vinculado ao usuário' });
+        return;
+      }
+
+      const restauranteIds = restaurantes.map(r => r.id);
+
+      const pedidos = await AppDataSource.getRepository(Pedido).find({
+        where: {
+          restaurante: {
+            id: In(restauranteIds)
+          }
+        },
+        relations: ['itens', 'itens.produto', 'restaurante'],
+        order: { dataHora: 'DESC' }
+      });
+
+      res.json(pedidos);
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ mensagem: 'Erro ao buscar pedidos' });
+      }
+  } 
 
 }
